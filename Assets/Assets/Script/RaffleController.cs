@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class RaffleController : MonoBehaviour {
-
-    public bool rowsdone = false;
-
+    
     public string[] defaultrownames;
     public int[] defaultrowseats;
 
@@ -25,6 +23,25 @@ public class RaffleController : MonoBehaviour {
 
     public int winningrow;
     public int winningseat;
+
+
+    // use internet protocol -like strings to express the phase
+    // Valid options:
+    // STARTUP -> the scene is being initialized (animations etc)
+    // STANDBY1  -> the first spinning process is ready
+    // STANDBY2  -> the second spinning process is ready
+    // FINISHED  -> the raffle is done
+
+    private const string STARTUP = "STARTUP";
+    private const string STANDBY1 = "STANDBY1";
+    private const string STANDBY2 = "STANDBY2";
+    private const string FINISHED = "FINISHED";
+
+    public string rafflingphase = "STARTUP";
+    public float startup_seconds = 5f;
+
+
+
 	// Use this for initialization
 	void Start () {
         
@@ -35,8 +52,15 @@ public class RaffleController : MonoBehaviour {
             Debug.Log("rowseat: " + containerlist[i]);
         }
 
+        StartCoroutine(StartupCountdown());
         
     
+    }
+
+    private IEnumerator StartupCountdown()
+    {
+        yield return new WaitForSeconds(startup_seconds);
+        rafflingphase = STANDBY1;
     }
 
     /// <summary>
@@ -45,17 +69,19 @@ public class RaffleController : MonoBehaviour {
     /// </summary>
     public void StartRaffle()
     {
-        spinbtn.interactable = false;
-        if (!rowsdone)
+        if (rafflingphase.Equals(STANDBY1))
         {
             spinneri.StartSpinner(spinningtime);
             StartCoroutine(RaffleRows());
+            spinbtn.interactable = false;
         }
-        else
+        else if (rafflingphase.Equals(STANDBY2))
         {
             spinneri.StartSpinner(spinningtime);
             StartCoroutine(RaffleSeats());
+            spinbtn.interactable = false;
         }
+        else Debug.Log("The raffle is already done: " + rafflingphase);
     }
 
     /// <summary>
@@ -87,7 +113,7 @@ public class RaffleController : MonoBehaviour {
         phase = 0f;
         localphase = 0f;
         spinbtn.interactable = true;
-        rowsdone = true;
+        rafflingphase = STANDBY2;
 
         yield return new WaitForEndOfFrame();
     }
@@ -120,10 +146,36 @@ public class RaffleController : MonoBehaviour {
         Debug.Log("exiting coroutine - raffleseats");
         phase = 0f;
         localphase = 0f;
-        spinbtn.interactable = true;
+        spinbtn.interactable = false;
+        rafflingphase = FINISHED;
 
         yield return new WaitForEndOfFrame();
     }
 
-    
+
+    //These are the setters for the rafflingphase string, public use onleeh!
+    #region statechanges
+
+    public void SetStartup()
+    {
+        rafflingphase = STARTUP;
+    }
+
+    public void SetStandby1()
+    {
+        rafflingphase = STANDBY1;
+    }
+
+    public void SetStandby2()
+    {
+        rafflingphase = STANDBY2;
+    }
+
+    public void SetFinished()
+    {
+        rafflingphase = FINISHED;
+    }
+
+    #endregion
+
 }
