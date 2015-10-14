@@ -8,6 +8,14 @@ public class LevelController : MonoBehaviour {
 
     public void LoadRafflegame()
     {
+        OptionPanelController optioner = GameObject.Find("options_panel").GetComponent<OptionPanelController>();
+        Debug.Log("found optioner: " + optioner.ToString());
+
+        RaffleController raffler = gameObject.GetComponent<RaffleController>();
+        Debug.Log("found rafflecontroller: " + optioner.ToString());
+
+        raffler.LoadOptions(optioner);
+
         Application.LoadLevel(rafflename);
     }
 

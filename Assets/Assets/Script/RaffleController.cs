@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class RaffleController : MonoBehaviour {
     
-    public string[] defaultrownames;
-    public int[] defaultrowseats;
+    public string[] rownames;
+    public int[] rowseats;
 
     public float spinningtime = 5f;
 
@@ -46,15 +46,21 @@ public class RaffleController : MonoBehaviour {
 	void Start () {
         
         //list
-        for (int i = 0; i < defaultrownames.Length; i++)
+        for (int i = 0; i < rownames.Length; i++)
         {
-            containerlist.Add(new RowSeatContainer(defaultrownames[i], defaultrowseats[i]));
+            containerlist.Add(new RowSeatContainer(rownames[i], rowseats[i]));
             Debug.Log("rowseat: " + containerlist[i]);
         }
 
         StartCoroutine(StartupCountdown());
         
     
+    }
+
+    public void LoadOptions(OptionPanelController input)
+    {
+        rowseats = input.optionrowseats;
+        rownames = input.optionrownames;
     }
 
     private IEnumerator StartupCountdown()
